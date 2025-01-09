@@ -64,7 +64,7 @@ const Navbar = () => {
                   Booked Halls
                 </a>
                 <a
-                  href="/approved-halls"
+                  href=""
                   className="block px-4 py-2 hover:bg-gray-100 rounded-b-lg"
                 >
                   Approved Halls
@@ -76,7 +76,7 @@ const Navbar = () => {
               <FaFileInvoice className="text-lg" />
               <span>Invoices</span>
             </a>
-            <a href="/settings" className="flex items-center space-x-2 hover:opacity-90">
+            <a href="" className="flex items-center space-x-2 hover:opacity-90">
               <FaCog className="text-lg" />
               <span>Settings</span>
             </a>
@@ -125,19 +125,19 @@ const Navbar = () => {
           <a href="/post-hall" className="block text-base hover:opacity-90">
             Post New Hall
           </a>
-          <a href="/update-hall" className="block text-base hover:opacity-90">
+          <a href="" className="block text-base hover:opacity-90">
             Update Hall
           </a>
           <a href="/booked-halls" className="block text-base hover:opacity-90">
             Booked Halls
           </a>
-          <a href="/approved-halls" className="block text-base hover:opacity-90">
+          <a href="" className="block text-base hover:opacity-90">
             Approved Halls
           </a>
           <a href="/invoices" className="block text-base hover:opacity-90">
             Invoices
           </a>
-          <a href="/settings" className="block text-base hover:opacity-90">
+          <a href="" className="block text-base hover:opacity-90">
             Settings
           </a>
           <a href="/logout" className="block text-base hover:opacity-90">
