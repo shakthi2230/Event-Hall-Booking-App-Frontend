@@ -30,11 +30,11 @@ const UserNavbar = () => {
               <FaBuilding className="text-lg" />
               <span>Hall List</span>
             </a>
-            <a href="/booked-halls" className="flex items-center space-x-2 hover:opacity-90">
+            <a href="" className="flex items-center space-x-2 hover:opacity-90">
               <FaClipboardList className="text-lg" />
               <span>Booked Halls</span>
             </a>
-            <a href="/settings" className="flex items-center space-x-2 hover:opacity-90">
+            <a href="" className="flex items-center space-x-2 hover:opacity-90">
               <FaCog className="text-lg" />
               <span>Settings</span>
             </a>
@@ -85,7 +85,7 @@ const UserNavbar = () => {
           <a href="/user-hall-list" className="block text-base hover:opacity-90">
             Booked Halls
           </a>
-          <a href="/settings" className="block text-base hover:opacity-90">
+          <a href="" className="block text-base hover:opacity-90">
             Settings
           </a>
           <a
