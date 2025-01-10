@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminContext } from "../../context/AdminContext"; // Import the context
 import { FaUserShield } from "react-icons/fa"; // Import the icon for the button
+import { FaGoogle, FaMicrosoft } from "react-icons/fa"; // Google and Microsoft icons
 
 import BASE_URL from '../../config';
 
@@ -35,7 +36,7 @@ function AdminLogin() {
                     refresh_token: data.refresh_token,
                     token_type: data.token_type,
                     user_id: data.user_id,
-                    admin_name:data.admin_name
+                    admin_name: data.admin_name
                 });
 
                 // Redirect to admin dashboard after a delay
@@ -48,7 +49,7 @@ function AdminLogin() {
         } catch (error) {
             setAlertMessage({ type: "error", text: "An error occurred. Please try again." });
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
 
@@ -94,6 +95,36 @@ function AdminLogin() {
                         {loading ? "Logging in..." : <><FaUserShield className="inline-block mr-2 text-2xl" /> Login</>}
                     </button>
                 </form>
+
+                {/* Social Login Buttons */}
+                <div className="flex justify-center items-center gap-6 mt-6">
+                    <div className="flex flex-col items-center">
+                        <button
+                            className="flex items-center justify-center p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition duration-300"
+                            onClick={() => console.log("Google login clicked")}
+                        >
+                            <FaGoogle className="text-2xl" />
+                        </button>
+
+                    </div>
+
+                    {/* Vertical line separator */}
+                    <div className="h-12 border-l-2 border-gray-400 mx-4"></div>
+
+                    <div className="flex flex-col items-center">
+                        <button
+                            className="flex items-center justify-center p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300"
+                            onClick={() => console.log("Microsoft login clicked")}
+                        >
+                            <FaMicrosoft className="text-2xl" />
+                        </button>
+
+                    </div>
+                </div>
+
+
+
+
 
                 {/* Forgot Password Link */}
                 <div className="mt-4 text-center">
