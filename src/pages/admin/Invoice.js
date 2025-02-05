@@ -5,6 +5,9 @@ import axios from "axios";
 import { FaEnvelope, FaCalendarAlt, FaCheckCircle, FaFileInvoice } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import BASE_URL from '../../config';
+import './InvoiceSendPage.css'; // Create this CSS file for custom styles
+import NoBookingsPage from "./NoBookingsPage";
+
 const InvoiceSendPage = () => {
   const { adminData } = useAdminContext();
   const [approvedBookings, setApprovedBookings] = useState([]);
@@ -15,6 +18,7 @@ const InvoiceSendPage = () => {
   const [cleaningCharge, setCleaningCharge] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const navigate = useNavigate();
+
   // Fetch Approved Bookings
   const fetchApprovedBookings = async () => {
     setLoading(true);
@@ -55,6 +59,9 @@ const InvoiceSendPage = () => {
 
     setTotalAmount(finalTotal);
 
+    // Show total amount in alert
+    alert(`Total Amount: ₹${finalTotal.toFixed(2)}`);
+
     // Send the invoice data to backend
     try {
       await axios.post(
@@ -89,18 +96,18 @@ const InvoiceSendPage = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">Invoice Send Page</h2>
+        {/* <h2 className="text-3xl font-bold text-gray-800 mb-6">Invoice Management</h2> */}
 
         {/* Loading and Error Handling */}
         {loading && <p className="text-gray-600">Loading approved bookings...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        <NoBookingsPage/>
 
         {!loading && !error && approvedBookings.length > 0 ? (
-          <div className="space-y-6 max-w-xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {approvedBookings.map((booking) => (
               <div
                 key={booking.id}
-                className="bg-gradient-to-r from-gray-50 to-gray-100 shadow-lg rounded-xl p-6 space-y-4"
+                className="bg-white shadow-lg rounded-xl p-6 space-y-4 hover:shadow-xl transition-shadow duration-300"
               >
                 {/* Header with User Name and Send Invoice Button */}
                 <div className="flex justify-between items-center">

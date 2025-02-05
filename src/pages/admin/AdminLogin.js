@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminContext } from "../../context/AdminContext"; // Import the context
 import { FaUserShield } from "react-icons/fa"; // Import the icon for the button
@@ -13,6 +13,15 @@ function AdminLogin() {
     const [loading, setLoading] = useState(false); // Added loading state
     const navigate = useNavigate();
     const { setAdminContext } = useAdminContext(); // Get the function to update context
+
+    useEffect(() => {
+        // Check if the admin is already logged in by checking local storage or context
+        const accessToken = localStorage.getItem("access_token");
+        if (accessToken) {
+            // If logged in, redirect to the dashboard
+            navigate("/admin-dashboard");
+        }
+    }, [navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,7 +39,7 @@ function AdminLogin() {
                 const data = await response.json();
                 setAlertMessage({ type: "success", text: "Login successful!" });
 
-                // Save the response data (tokens, user_id) in context
+                // Save the response data (tokens, user_id) in context and localStorage
                 setAdminContext({
                     access_token: data.access_token,
                     refresh_token: data.refresh_token,
@@ -38,10 +47,11 @@ function AdminLogin() {
                     user_id: data.user_id,
                     admin_name: data.admin_name
                 });
+                localStorage.setItem("access_token", data.access_token);
 
                 // Redirect to admin dashboard after a delay
                 setTimeout(() => {
-                    navigate("/admin-dashboard");
+                    navigate("/booked-halls");
                 }, 2000);
             } else {
                 setAlertMessage({ type: "error", text: "Invalid email or password!" });
@@ -54,7 +64,7 @@ function AdminLogin() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-500">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-500 px-4">
             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
                 <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Admin Login</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,7 +115,6 @@ function AdminLogin() {
                         >
                             <FaGoogle className="text-2xl" />
                         </button>
-
                     </div>
 
                     {/* Vertical line separator */}
@@ -118,13 +127,8 @@ function AdminLogin() {
                         >
                             <FaMicrosoft className="text-2xl" />
                         </button>
-
                     </div>
                 </div>
-
-
-
-
 
                 {/* Forgot Password Link */}
                 <div className="mt-4 text-center">

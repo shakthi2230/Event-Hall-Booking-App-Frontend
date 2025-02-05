@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAdminContext } from "../../context/AdminContext";
 import Navbar from "../../components/UserNavbar";
-import { FaMapMarkerAlt, FaMoneyBillWave, FaUsers, FaBroom } from "react-icons/fa";
+import { FaMapMarkerAlt, FaMoneyBillWave, FaUsers, FaBroom, FaUtensils, FaBed, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from '../../config';
-
 
 const UserHallList = () => {
     const { adminData } = useAdminContext();
@@ -13,7 +12,7 @@ const UserHallList = () => {
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
     const [selectedHallImages, setSelectedHallImages] = useState([]);
-    const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const navigate = useNavigate();
@@ -32,8 +31,9 @@ const UserHallList = () => {
                     },
                 });
                 setHalls(response.data.halls);
+                setErrorMessage(""); // Clear any previous errors
             } catch (error) {
-                setErrorMessage("Failed to load hall list. Please try again.");
+                setErrorMessage(error.response?.data?.message || "Failed to load hall list. Please try again.");
             } finally {
                 setLoading(false);
             }
@@ -44,94 +44,87 @@ const UserHallList = () => {
 
     // Open image modal
     const handleImageClick = (images, index) => {
-        setSelectedHallImages(images);
-        setSelectedImageIndex(index);
-        setIsModalOpen(true);
+        if (images.length > 0) {
+            setSelectedHallImages(images);
+            setSelectedImageIndex(index);
+            setIsModalOpen(true);
+        }
     };
 
     // Close image modal
     const closeModal = () => {
         setIsModalOpen(false);
-        setSelectedImageIndex(null);
+        setSelectedImageIndex(0);
     };
 
     // Navigate images
     const nextImage = () => {
-        if (selectedImageIndex < selectedHallImages.length - 1) {
-            setSelectedImageIndex(selectedImageIndex + 1);
-        }
+        setSelectedImageIndex((prevIndex) => (prevIndex + 1) % selectedHallImages.length);
     };
 
     const prevImage = () => {
-        if (selectedImageIndex > 0) {
-            setSelectedImageIndex(selectedImageIndex - 1);
-        }
+        setSelectedImageIndex((prevIndex) => (prevIndex - 1 + selectedHallImages.length) % selectedHallImages.length);
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-50">
             {/* Navbar */}
             <Navbar />
 
             {/* Main Content */}
-            <div className="container m-4 mx-auto px-4 py-6">
-                <h1 className="text-3xl font-bold text-gray-800 mb-8">Hall List</h1>
+            <div className="container mx-auto px-4 py-8">
+                <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">Available Halls</h1>
 
                 {/* Error Message */}
                 {errorMessage && (
-                    <div className="text-red-700 bg-red-100 p-4 rounded-lg mb-6 shadow-lg">{errorMessage}</div>
+                    <div className="text-red-700 bg-red-100 p-4 rounded-lg mb-6 text-center shadow-sm">
+                        {errorMessage}
+                    </div>
                 )}
 
                 {/* Loading State */}
                 {loading ? (
                     <div className="text-center text-lg text-gray-600">Loading...</div>
                 ) : (
-                    <div className="space-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {halls.length === 0 ? (
-                            <div className="text-center text-lg text-gray-500">No halls available.</div>
+                            <div className="text-center text-lg text-gray-500 col-span-full">No halls available.</div>
                         ) : (
                             halls.map((hall) => (
-                                <div key={hall.id} className="bg-white rounded-lg shadow-lg transition-transform transform hover:scale-102 hover:shadow-xl">
-                                    {/* Hall Images */}
-                                    <div className="flex overflow-x-auto space-x-6 py-6 px-8 justify-around">
-                                        {hall.image_urls.map((image, index) => (
+                                <div key={hall.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                    {/* Hall Image */}
+                                    <div className="relative">
+                                        {hall.image_urls.length > 0 ? (
                                             <img
-                                                key={index}
-                                                src={image}
-                                                alt={`Hall ${index + 1}`}
-                                                className="w-24 h-24 object-cover rounded-lg cursor-pointer shadow-md hover:scale-110 transition-all"
-                                                onClick={() => handleImageClick(hall.image_urls, index)}
+                                                src={hall.image_urls[0]}
+                                                alt={`Hall ${hall.hall_name}`}
+                                                className="w-full h-64 object-cover cursor-pointer"
+                                                onClick={() => handleImageClick(hall.image_urls, 0)}
                                             />
-                                        ))}
+                                        ) : (
+                                            <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-500">
+                                                No Image Available
+                                            </div>
+                                        )}
+                                        <button
+                                            onClick={() => handleImageClick(hall.image_urls, 0)}
+                                            className="absolute bottom-4 right-4 bg-white px-3 py-2 rounded-full shadow-md text-sm font-medium hover:bg-gray-100"
+                                        >
+                                            View More
+                                        </button>
                                     </div>
 
                                     {/* Hall Details */}
-                                    <div className="p-8">
-                                        {/* Hall Name */}
-                                        <div className="flex flex-col items-center justify-center p-8 text-center">
-                                            {/* Hall Name */}
-                                            <h2 className="text-3xl font-semibold text-gray-900 hover:text-indigo-600 transition-colors duration-300 relative group">
-                                                {hall.hall_name}
-
-                                                {/* Animated Underline */}
-                                                <span className="absolute left-0 bottom-0 w-full h-0.5 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-all duration-300"></span>
-                                            </h2>
-
-                                            {/* Location */}
-                                            <p className="flex items-center text-gray-500 mt-2 justify-center">
-                                                <FaMapMarkerAlt className="mr-2 text-indigo-500" />
-                                                {hall.hall_location}
-                                            </p>
-
-                                            {/* Address */}
-                                            <p className="text-lg text-gray-600 mt-2">{hall.hall_address}</p>
-
-                                            {/* About Hall */}
-                                            <p className="text-gray-700 mt-4 leading-relaxed">{hall.about_hall}</p>
-                                        </div>
+                                    <div className="p-6">
+                                        <h2 className="text-2xl font-bold text-gray-900 mb-2">{hall.hall_name}</h2>
+                                        <p className="flex items-center text-gray-600 mb-4">
+                                            <FaMapMarkerAlt className="mr-2 text-indigo-500" />
+                                            {hall.hall_location}
+                                        </p>
+                                        <p className="text-gray-700 mb-4">{hall.about_hall}</p>
 
                                         {/* Pricing and Other Details */}
-                                        <div className="grid grid-cols-2 gap-8 mt-8 md:grid-cols-4">
+                                        <div className="grid grid-cols-2 gap-4 mb-6">
                                             <InfoCard
                                                 icon={<FaMoneyBillWave className="text-green-500" />}
                                                 title="Price Per Day"
@@ -144,25 +137,33 @@ const UserHallList = () => {
                                             />
                                             <InfoCard
                                                 icon={<FaMoneyBillWave className="text-green-500" />}
-                                                title="Maintenance Charge"
+                                                title="Maintenance"
                                                 value={`₹${hall.maintenance_charge_per_day}`}
                                             />
                                             <InfoCard
                                                 icon={<FaBroom className="text-yellow-500" />}
-                                                title="Cleaning Charge"
+                                                title="Cleaning"
                                                 value={`₹${hall.cleaning_charge_per_day}`}
+                                            />
+                                            <InfoCard
+                                                icon={<FaUtensils className="text-purple-500" />}
+                                                title="Catering Members"
+                                                value={`${hall.catering_work_members}`}
+                                            />
+                                            <InfoCard
+                                                icon={<FaBed className="text-pink-500" />}
+                                                title="No. of Rooms"
+                                                value={`${hall.number_of_rooms}`}
                                             />
                                         </div>
 
                                         {/* Book Now Button */}
-                                        <div className="mt-6 text-center">
-                                            <button
-                                                className="px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-indigo-600"
-                                                onClick={() => handleBookNow(hall)} 
-                                            >
-                                                Book Now
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={() => handleBookNow(hall)}
+                                            className="w-full bg-indigo-500 text-white py-3 rounded-lg font-semibold hover:bg-indigo-600 transition-colors"
+                                        >
+                                            Book Now
+                                        </button>
                                     </div>
                                 </div>
                             ))
@@ -172,37 +173,35 @@ const UserHallList = () => {
             </div>
 
             {/* Modal for Viewing Images */}
-            {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-                    <div className="bg-white p-6 rounded-lg w-full max-w-4xl relative shadow-lg">
+            {isModalOpen && selectedHallImages.length > 0 && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+                    <div className="bg-white rounded-lg w-full max-w-3xl mx-4 relative">
                         <button
                             onClick={closeModal}
-                            className="absolute top-4 right-4 text-gray-800 text-3xl transition-colors hover:text-indigo-600"
+                            className="absolute top-4 right-4 text-gray-800 text-3xl hover:text-indigo-600"
                         >
                             &times;
                         </button>
-                        {selectedImageIndex !== null && (
+                        <div className="p-6">
                             <img
                                 src={selectedHallImages[selectedImageIndex]}
                                 alt="Selected"
-                                className="w-full h-96 object-cover rounded-lg shadow-lg"
+                                className="w-full h-96 object-cover rounded-lg"
                             />
-                        )}
-                        <div className="flex justify-between mt-6">
-                            <button
-                                onClick={prevImage}
-                                className="px-6 py-3 bg-gray-200 rounded-lg text-gray-800 font-semibold disabled:opacity-50 transition-all hover:bg-gray-300"
-                                disabled={selectedImageIndex === 0}
-                            >
-                                Prev
-                            </button>
-                            <button
-                                onClick={nextImage}
-                                className="px-6 py-3 bg-gray-200 rounded-lg text-gray-800 font-semibold disabled:opacity-50 transition-all hover:bg-gray-300"
-                                disabled={selectedImageIndex === selectedHallImages.length - 1}
-                            >
-                                Next
-                            </button>
+                            <div className="flex justify-between mt-4">
+                                <button
+                                    onClick={prevImage}
+                                    className="px-6 py-3 bg-gray-200 rounded-lg text-gray-800 font-semibold hover:bg-gray-300"
+                                >
+                                    <FaChevronLeft />
+                                </button>
+                                <button
+                                    onClick={nextImage}
+                                    className="px-6 py-3 bg-gray-200 rounded-lg text-gray-800 font-semibold hover:bg-gray-300"
+                                >
+                                    <FaChevronRight />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -213,11 +212,11 @@ const UserHallList = () => {
 
 // InfoCard Component
 const InfoCard = ({ icon, title, value }) => (
-    <div className="flex items-center bg-gray-100 rounded-lg p-4 shadow-sm">
-        <div className="text-2xl mr-4">{icon}</div>
+    <div className="flex items-center space-x-4 bg-gray-50 p-3 rounded-lg">
+        <div className="text-2xl text-gray-600">{icon}</div>
         <div>
-            <h4 className="text-gray-700 font-medium">{title}</h4>
-            <p className="text-gray-500">{value}</p>
+            <h4 className="text-sm text-gray-500">{title}</h4>
+            <p className="text-lg font-semibold text-gray-800">{value}</p>
         </div>
     </div>
 );

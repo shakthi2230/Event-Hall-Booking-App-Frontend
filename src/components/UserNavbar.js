@@ -1,9 +1,10 @@
-import {React , useContext } from "react";
-import { FaBuilding, FaClipboardList, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { React, useContext, useState } from "react";
+import { FaBuilding, FaClipboardList, FaCog, FaSignOutAlt, FaBars } from "react-icons/fa";
 import { UserContext } from "../context/UserContext";
 
 const UserNavbar = () => {
- const {logoutUser, loginuser} = useContext(UserContext);
+  const { logoutUser } = useContext(UserContext);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -12,7 +13,7 @@ const UserNavbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+    <nav className="bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -20,28 +21,25 @@ const UserNavbar = () => {
             <h1 className="text-2xl font-bold">User</h1>
           </div>
 
-          {/* Menu Items */}
+          {/* Desktop Menu Items */}
           <div className="hidden md:flex space-x-8">
-          <a href="/user-dashboard" className="flex items-center space-x-2 hover:opacity-90">
+            
+            <a href="/UserDashboard" className="flex items-center space-x-2 hover:opacity-80 transition">
               <FaBuilding className="text-lg" />
               <span>Dashboard</span>
             </a>
-            <a href="/user-hall-list" className="flex items-center space-x-2 hover:opacity-90">
-              <FaBuilding className="text-lg" />
-              <span>Hall List</span>
-            </a>
-            <a href="" className="flex items-center space-x-2 hover:opacity-90">
+            <a href="#" className="flex items-center space-x-2 hover:opacity-80 transition">
               <FaClipboardList className="text-lg" />
               <span>Booked Halls</span>
             </a>
-            <a href="" className="flex items-center space-x-2 hover:opacity-90">
+            <a href="#" className="flex items-center space-x-2 hover:opacity-80 transition">
               <FaCog className="text-lg" />
               <span>Settings</span>
             </a>
             <a
               href="/logout"
               onClick={handleLogout}
-              className="flex items-center space-x-2 hover:opacity-90"
+              className="flex items-center space-x-2 hover:opacity-80 transition"
             >
               <FaSignOutAlt className="text-lg" />
               <span>Logout</span>
@@ -51,52 +49,43 @@ const UserNavbar = () => {
           {/* Mobile Menu Toggle */}
           <div className="md:hidden flex items-center">
             <button
-              type="button"
-              className="text-white hover:text-gray-200 focus:outline-none focus:text-gray-200"
-              onClick={() =>
-                document.getElementById("mobile-menu").classList.toggle("hidden")
-              }
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-white hover:text-gray-200 focus:outline-none"
             >
-              <svg
-                className="h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+              <FaBars className="h-6 w-6" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <div id="mobile-menu" className="hidden md:hidden">
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <a href="/user-hall-list" className="block text-base hover:opacity-90">
-            Hall List
-          </a>
-          <a href="/user-hall-list" className="block text-base hover:opacity-90">
-            Booked Halls
-          </a>
-          <a href="" className="block text-base hover:opacity-90">
-            Settings
-          </a>
-          <a
-            href="/logout"
-            onClick={handleLogout}
-            className="block text-base hover:opacity-90"
-          >
-            Logout
-          </a>
+      {isOpen && (
+        <div className="md:hidden bg-white text-black p-4 shadow-lg rounded-b-lg">
+          <div className="space-y-4">
+            
+            <a href="/UserDashboard" className="block text-lg hover:text-gray-600 transition">
+              <FaBuilding className="inline-block mr-2" />
+              dashboard
+            </a>
+            <a href="#" className="block text-lg hover:text-gray-600 transition">
+              <FaClipboardList className="inline-block mr-2" />
+              Booked Halls
+            </a>
+            <a href="#" className="block text-lg hover:text-gray-600 transition">
+              <FaCog className="inline-block mr-2" />
+              Settings
+            </a>
+            <a
+              href="/logout"
+              onClick={handleLogout}
+              className="block text-lg hover:text-gray-600 transition"
+            >
+              <FaSignOutAlt className="inline-block mr-2" />
+              Logout
+            </a>
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

@@ -7,7 +7,7 @@ import LoginOptionsPage from './pages/LoginOptionsPage';
 import Login from './pages/user/Login';
 import UserRegisterPage from './pages/user/UserRegister';
 import ForgotPassword from './pages/user/Forgotpassword';
-import UserDashboard from './pages/user/UserDashboard';
+
 import UserHallList from './pages/user/UserHallList';
 import BookingFormPage from './pages/user/BookingFormPage';
 
@@ -19,7 +19,8 @@ import HallRegister from './pages/admin/HallRegister';
 import HallList from './pages/admin/HallList';
 import BookingList from './pages/admin/BookingList';
 import InvoiceSendPage from './pages/admin/Invoice';
-
+import SubscriptionPage from './pages/admin/Subscription';
+import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 
 const App = () => {
   return (
@@ -31,18 +32,20 @@ const App = () => {
       <Route path="/login-options" element={<LoginOptionsPage />} />
       <Route path="/user-signup" element={<UserRegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/user-dashboard" element={<UserDashboard />} />
-      <Route path="/user-hall-list" element={<UserHallList />} />
+      {/* <Route path="/user-dashboard" element={<UserDashboard />} /> */}
+      <Route path="/UserDashboard" element={<UserHallList />} />
       <Route path="/booking-form" element={<BookingFormPage />} />
 
       {/* Admin routes */}
       <Route path="/admin-login" element={<AdminLoginPage />} />
       <Route path="/admin-signup" element={<AdminRegisterPage />} />
-      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/admin-dashboard" element={<BookingList />} />
       <Route path="/post-hall" element={<HallRegister />} />
       <Route path="/update-hall-list" element={<HallList />} />
       <Route path="/booked-halls" element={<BookingList />} />
       <Route path="/invoices" element={<InvoiceSendPage />} />
+      <Route path="/subscriptionPage" element={<SubscriptionPage />} />
+      <Route path="/adminsettingspage" element={<AdminSettingsPage />} />
     </Routes>
   );
 };

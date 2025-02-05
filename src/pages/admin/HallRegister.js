@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Navbar from "../../components/AdminNavbar";
 import { useAdminContext } from "../../context/AdminContext";
-import { FaUser, FaLocationArrow, FaDollarSign, FaRegFileImage } from "react-icons/fa"
+import { FaUser, FaLocationArrow, FaDollarSign, FaRegFileImage } from "react-icons/fa";
 import BASE_URL from '../../config';
 
 const HallRegister = () => {
@@ -31,12 +31,7 @@ const HallRegister = () => {
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
-        // if (files.length < 3 || files.length > 8) {
-        //     setErrorMessage("Please upload between 3 to 8 images.");
-        //     return;
-        // }
         setFormData({ ...formData, images: files });
-        // setErrorMessage("");
     };
 
     const handleImageDelete = (index) => {
@@ -69,19 +64,18 @@ const HallRegister = () => {
         formPayload.append("number_of_rooms", formData.numberOfRooms);
         formPayload.append("about_hall", formData.aboutHall);
 
-        // Append each image file with the same key "images" as expected by FastAPI
         formData.images.forEach((image) => {
-            formPayload.append("images", image); // Use "images" instead of "image[0]", "image[1]", etc.
+            formPayload.append("images", image);
         });
 
         try {
             const response = await axios.post(
-                `${BASE_URL}/hall/register`, // API endpoint
+                `${BASE_URL}/hall/register`,
                 formPayload,
                 {
                     headers: {
-                        Authorization: `Bearer ${adminData.access_token}`, // Bearer token for authentication
-                        "Content-Type": "multipart/form-data", // Ensure to send multipart/form-data
+                        Authorization: `Bearer ${adminData.access_token}`,
+                        "Content-Type": "multipart/form-data",
                     },
                 }
             );
@@ -111,73 +105,86 @@ const HallRegister = () => {
         }
     };
 
-
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50">
             {/* Navbar */}
             <Navbar />
 
             {/* Main Content */}
             <div className="container mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">Register a Hall</h1>
+                <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
+                    Register a Hall
+                </h1>
 
+                {/* Messages */}
                 {errorMessage && (
-                    <div className="mb-4 text-red-500 bg-red-100 p-4 rounded-lg">
+                    <div className="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
                         {errorMessage}
                     </div>
                 )}
 
                 {successMessage && (
-                    <div className="mb-4 text-green-500 bg-green-100 p-4 rounded-lg">
+                    <div className="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700">
                         {successMessage}
                     </div>
                 )}
 
+                {/* Form */}
                 <form
-                    className="bg-white p-8 rounded-lg shadow-lg space-y-6"
+                    className="bg-white p-8 rounded-xl shadow-2xl space-y-6"
                     onSubmit={handleSubmit}
                     encType="multipart/form-data"
                 >
+                    {/* Hall Name */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-600">Hall Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Hall Name
+                        </label>
                         <input
                             type="text"
                             name="hallName"
                             value={formData.hallName}
                             onChange={handleInputChange}
-                            className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             required
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-600">Location</label>
-                        <input
-                            type="text"
-                            name="hallLocation"
-                            value={formData.hallLocation}
-                            onChange={handleInputChange}
-                            className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            required
-                        />
-                    </div>
+                    {/* Location and Address */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Location
+                            </label>
+                            <input
+                                type="text"
+                                name="hallLocation"
+                                value={formData.hallLocation}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                required
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-600">Address</label>
-                        <input
-                            type="text"
-                            name="hallAddress"
-                            value={formData.hallAddress}
-                            onChange={handleInputChange}
-                            className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            required
-                        />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Address
+                            </label>
+                            <input
+                                type="text"
+                                name="hallAddress"
+                                value={formData.hallAddress}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                required
+                            />
+                        </div>
                     </div>
 
                     {/* Pricing Inputs */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-600">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Price Per Day
                             </label>
                             <input
@@ -185,13 +192,13 @@ const HallRegister = () => {
                                 name="hallPricePerDay"
                                 value={formData.hallPricePerDay}
                                 onChange={handleInputChange}
-                                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Maintenance Charge
                             </label>
                             <input
@@ -199,13 +206,13 @@ const HallRegister = () => {
                                 name="maintenanceChargePerDay"
                                 value={formData.maintenanceChargePerDay}
                                 onChange={handleInputChange}
-                                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Cleaning Charge
                             </label>
                             <input
@@ -213,16 +220,16 @@ const HallRegister = () => {
                                 name="cleaningChargePerDay"
                                 value={formData.cleaningChargePerDay}
                                 onChange={handleInputChange}
-                                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 required
                             />
                         </div>
                     </div>
 
                     {/* Catering and Capacity */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-600">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Catering Work Members
                             </label>
                             <input
@@ -230,13 +237,13 @@ const HallRegister = () => {
                                 name="cateringWorkMembers"
                                 value={formData.cateringWorkMembers}
                                 onChange={handleInputChange}
-                                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Total Hall Capacity
                             </label>
                             <input
@@ -244,13 +251,13 @@ const HallRegister = () => {
                                 name="totalHallCapacity"
                                 value={formData.totalHallCapacity}
                                 onChange={handleInputChange}
-                                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Number of Rooms
                             </label>
                             <input
@@ -258,60 +265,64 @@ const HallRegister = () => {
                                 name="numberOfRooms"
                                 value={formData.numberOfRooms}
                                 onChange={handleInputChange}
-                                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 required
                             />
                         </div>
                     </div>
 
+                    {/* About Hall */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-600">About Hall</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            About Hall
+                        </label>
                         <textarea
                             name="aboutHall"
                             value={formData.aboutHall}
                             onChange={handleInputChange}
-                            className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            rows="4"
                             required
                         ></textarea>
                     </div>
 
+                    {/* Hall Images */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-600">Hall Images</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Hall Images (3-8 images)
+                        </label>
                         <input
                             type="file"
                             accept="image/*"
                             multiple
                             onChange={handleImageUpload}
-                            className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
-                        <div className="mt-2">
-                            {formData.images.length > 0 && (
-                                <div className="flex space-x-4">
-                                    {formData.images.map((image, index) => (
-                                        <div key={index} className="relative">
-                                            <img
-                                                src={URL.createObjectURL(image)}
-                                                alt={`Image ${index + 1}`}
-                                                className="w-24 h-24 object-cover rounded-md"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => handleImageDelete(index)}
-                                                className="absolute top-0 right-0 text-white bg-red-500 p-1 rounded-full"
-                                            >
-                                                &times;
-                                            </button>
-                                        </div>
-                                    ))}
+                        <div className="mt-4 flex flex-wrap gap-4">
+                            {formData.images.map((image, index) => (
+                                <div key={index} className="relative">
+                                    <img
+                                        src={URL.createObjectURL(image)}
+                                        alt={`Image ${index + 1}`}
+                                        className="w-24 h-24 object-cover rounded-lg"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => handleImageDelete(index)}
+                                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                                    >
+                                        &times;
+                                    </button>
                                 </div>
-                            )}
+                            ))}
                         </div>
                     </div>
 
-                    <div className="mt-4">
+                    {/* Submit Button */}
+                    <div className="mt-6">
                         <button
                             type="submit"
-                            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none"
+                            className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none"
                             disabled={loading}
                         >
                             {loading ? "Submitting..." : "Register Hall"}
