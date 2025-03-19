@@ -21,6 +21,10 @@ import BookingList from './pages/admin/BookingList';
 import InvoiceSendPage from './pages/admin/Invoice';
 import SubscriptionPage from './pages/admin/Subscription';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+import ContactUs from './pages/Contactus';
+import Payment from './pages/Payment';
 
 const App = () => {
   return (
@@ -46,6 +50,10 @@ const App = () => {
       <Route path="/invoices" element={<InvoiceSendPage />} />
       <Route path="/subscriptionPage" element={<SubscriptionPage />} />
       <Route path="/adminsettingspage" element={<AdminSettingsPage />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="payment" element={<Payment />} />
     </Routes>
   );
 };

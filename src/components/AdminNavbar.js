@@ -44,7 +44,7 @@ const Navbar = () => {
               <FaFileInvoice className="text-xl" />
               <span>Invoices</span>
             </a>
-            <a href="" className="flex items-center space-x-2 hover:opacity-90 text-lg">
+            <a href="/subscriptionPage" className="flex items-center space-x-2 hover:opacity-90 text-lg">
               <FaCog className="text-xl" />
               <span>Settings</span>
             </a>
@@ -86,7 +86,7 @@ const Navbar = () => {
             <FaFileInvoice className="inline-block mr-2" />
             Invoices
           </a>
-          <a href="" className="block text-lg hover:opacity-90">
+          <a href="/subscriptionPage" className="block text-lg hover:opacity-90">
             <FaCog className="inline-block mr-2" />
             Settings
           </a>

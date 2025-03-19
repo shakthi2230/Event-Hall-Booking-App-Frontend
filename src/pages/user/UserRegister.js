@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { FaUser, FaEnvelope, FaCity, FaLock, FaMobileAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+
 import BASE_URL from '../../config';
+import { FaGoogle, FaMicrosoft } from "react-icons/fa";
+import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const UserRegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +17,9 @@ const UserRegisterPage = () => {
     password: "",
     mobile: "",
     country_name: "Indian",
+    googleId: "",
   });
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
@@ -21,6 +27,41 @@ const UserRegisterPage = () => {
   const [verificationMessage, setVerificationMessage] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const navigate = useNavigate();
+  const [isGoogleAuthenticated, setIsGoogleAuthenticated] = useState(false);
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await axios.get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenResponse.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenResponse.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+
+        // Update the formData state with email and Google ID after successful response
+        setFormData({
+          ...formData,
+          email: res.data.email,
+          googleId: res.data.id, // Set Google ID
+          username: res.data.name,
+        });
+
+        setIsDisabled(true);
+        setIsGoogleAuthenticated(true);
+
+        // Call handleSubmit after successful Google login
+        // handleSubmit(new Event("submit"));
+      } catch (error) {
+        console.error("Error fetching Google profile:", error);
+      }
+    },
+    onError: (error) => console.error("Google Login Failed:", error),
+  });
+
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,8 +71,6 @@ const UserRegisterPage = () => {
   // Validation functions
   const isEmailValid = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isMobileValid = (mobile) => /^[0-9]{10}$/.test(mobile);
-
-
 
   // Function to send OTP
   const sendOtp = async () => {
@@ -44,7 +83,7 @@ const UserRegisterPage = () => {
       const response = await fetch(`${BASE_URL}/api/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile: "+91"+formData.mobile }),
+        body: JSON.stringify({ mobile: "+91" + formData.mobile }),
       });
 
       if (response.ok) {
@@ -66,7 +105,7 @@ const UserRegisterPage = () => {
       const response = await fetch(`${BASE_URL}/api/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile: "+91"+formData.mobile, otp: formData.otp }),
+        body: JSON.stringify({ mobile: "+91" + formData.mobile, otp: formData.otp }),
       });
 
       const data = await response.json();
@@ -83,12 +122,13 @@ const UserRegisterPage = () => {
     }
   };
 
-  // Handle form submission
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
+    // Check required fields for both manual and Google registration
     if (!formData.username || !formData.email || !formData.city_name || !formData.address) {
       setError("Please fill out all required fields.");
       return;
@@ -99,13 +139,15 @@ const UserRegisterPage = () => {
       return;
     }
 
-    if (!formData.password) {
-      setError("Password is required.");
+    // Check if OTP is verified
+    if (!otpVerified) {
+      setError("Please verify your OTP before submitting.");
       return;
     }
 
-    if (!otpVerified) {
-      setError("Please verify your OTP before submitting.");
+    // If not using Google authentication, password is required.
+    if (!formData.googleId && !formData.password) {
+      setError("Password is required.");
       return;
     }
 
@@ -113,13 +155,18 @@ const UserRegisterPage = () => {
     const dataToSend = {
       username: formData.username,
       email: formData.email,
-      password: formData.password,
       phone_number: "+91" + formData.mobile, // Concatenate +91 with mobile number
       city_name: formData.city_name,
       country_name: "India", // Assuming country is always India
       address: formData.address, // Add the address field to your form data
     };
 
+    // If registered via Google, include googleId; otherwise, include password
+    if (formData.googleId) {
+      dataToSend.googleId = formData.googleId;
+    } else {
+      dataToSend.password = formData.password;
+    }
 
     try {
       const response = await fetch(`${BASE_URL}/user/register`, {
@@ -143,7 +190,6 @@ const UserRegisterPage = () => {
     }
   };
 
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-500 px-4">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg md:p-8">
@@ -152,6 +198,8 @@ const UserRegisterPage = () => {
         </h2>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
+
+
           {/* Username */}
           <div className="flex items-center gap-3">
             <FaUser className="text-gray-500" />
@@ -166,6 +214,7 @@ const UserRegisterPage = () => {
                 placeholder="Enter your username"
                 value={formData.username}
                 onChange={handleInputChange}
+                disabled={isDisabled}
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
@@ -183,6 +232,7 @@ const UserRegisterPage = () => {
                 name="email"
                 placeholder="Enter your email"
                 value={formData.email}
+                disabled={isDisabled}
                 onChange={handleInputChange}
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
@@ -225,31 +275,33 @@ const UserRegisterPage = () => {
             </div>
           </div>
 
-          {/* Password */}
-          <div className="flex items-center gap-3">
-            <FaLock className="text-gray-500" />
-            <div className="w-full">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-600">
-                Password
-              </label>
-              <input
-                type={passwordVisible ? "text" : "password"}
-                id="password"
-                name="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setPasswordVisible(!passwordVisible)}
-                className="text-sm text-blue-500 mt-1"
-              >
-                {passwordVisible ? "Hide Password" : "Show Password"}
-              </button>
+          {/* Password (conditionally rendered) */}
+          {!isGoogleAuthenticated && (
+            <div className="flex items-center gap-3">
+              <FaLock className="text-gray-500" />
+              <div className="w-full">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-600">
+                  Password
+                </label>
+                <input
+                  type={passwordVisible ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPasswordVisible(!passwordVisible)}
+                  className="text-sm text-blue-500 mt-1"
+                >
+                  {passwordVisible ? "Hide Password" : "Show Password"}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
           {/* Mobile */}
           <div className="flex items-center gap-3">
             <FaMobileAlt className="text-gray-500" />
@@ -320,6 +372,23 @@ const UserRegisterPage = () => {
               Log In
             </a>
           </p>
+        </div>
+        <div className="flex justify-center items-center gap-6 mt-6">
+          <button
+            className="flex items-center justify-center p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition duration-300"
+            onClick={googleLogin}
+          >
+            <FaGoogle className="text-2xl" />
+          </button>
+
+          <div className="h-12 border-l-2 border-gray-400 mx-4"></div>
+
+          <button
+            className="flex items-center justify-center p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300"
+            onClick={() => console.log("Microsoft login clicked")}
+          >
+            <FaMicrosoft className="text-2xl" />
+          </button>
         </div>
       </div>
     </div>

@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAdminContext } from "../../context/AdminContext"; // Import the context
 import { FaUserShield } from "react-icons/fa"; // Import the icon for the button
 import { FaGoogle, FaMicrosoft } from "react-icons/fa"; // Google and Microsoft icons
-
+import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
 import BASE_URL from '../../config';
 
 function AdminLogin() {
@@ -12,21 +13,58 @@ function AdminLogin() {
     const [alertMessage, setAlertMessage] = useState(null);
     const [loading, setLoading] = useState(false); // Added loading state
     const navigate = useNavigate();
-    const { setAdminContext } = useAdminContext(); // Get the function to update context
+    const { setAdminContext, adminData } = useAdminContext(); // Get the function to update context
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+        googleId: "",
+    });
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                const res = await axios.get(
+                    `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenResponse.access_token}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${tokenResponse.access_token}`,
+                            Accept: "application/json",
+                        },
+                    }
+                );
+
+                // Update formData state with email and Google ID
+                const updatedFormData = {
+                    email: res.data.email,
+                    googleId: res.data.id,
+                };
+                setFormData(updatedFormData);
+
+                // Call handleSubmit after setting formData
+                handleSubmit(updatedFormData);
+            } catch (error) {
+                console.error("Error fetching Google profile:", error);
+            }
+        },
+        onError: (error) => console.error("Google Login Failed:", error),
+    });
 
     useEffect(() => {
         // Check if the admin is already logged in by checking local storage or context
-        const accessToken = localStorage.getItem("access_token");
+        const accessToken = localStorage.getItem`${adminData.access_token}`;
         if (accessToken) {
             // If logged in, redirect to the dashboard
-            navigate("/admin-dashboard");
+            navigate("/subscriptionPage");
         }
     }, [navigate]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const loginData = { email, password };
-        setLoading(true); // Set loading to true when the request starts
+    const handleSubmit = async (updatedFormData) => {
+        setLoading(true);
+        console.log("Form Data Submitted:", updatedFormData);
+        
+        const loginData = updatedFormData.googleId
+            ? { email: updatedFormData.email, googleId: updatedFormData.googleId }
+            : { email: updatedFormData.email, password: updatedFormData.password };
 
         try {
             const response = await fetch(`${BASE_URL}/admin/login`, {
@@ -63,11 +101,17 @@ function AdminLogin() {
         }
     };
 
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        const formData = { email, password };
+        handleSubmit(formData);
+    };
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-500 px-4">
             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
                 <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Admin Login</h2>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleFormSubmit} className="space-y-6">
                     {/* Email Input */}
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email</label>
@@ -111,7 +155,7 @@ function AdminLogin() {
                     <div className="flex flex-col items-center">
                         <button
                             className="flex items-center justify-center p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition duration-300"
-                            onClick={() => console.log("Google login clicked")}
+                            onClick={googleLogin}
                         >
                             <FaGoogle className="text-2xl" />
                         </button>

@@ -35,11 +35,19 @@ const HomePage = () => {
       </div>
 
       {/* Footer - Hidden on mobile, visible on md and larger */}
-      <div className="absolute bottom-0 w-full text-center py-4 bg-black bg-opacity-60 hidden md:block">
+      <div className="absolute bottom-0 w-full text-center py-4 bg-black bg-opacity-60 hidden md:flex justify-center items-center gap-4">
         <p className="text-white text-xs md:text-sm">
           © 2025 RakshasaHalls. All rights reserved.
         </p>
+        <a href="/privacy-policy" className="text-white text-xs md:text-sm hover:underline">
+          Privacy Policy
+        </a>
+        <span className="text-white">|</span>
+        <a href="/terms-and-conditions" className="text-white text-xs md:text-sm hover:underline">
+          Terms & Conditions
+        </a>
       </div>
+
     </div>
   );
 };

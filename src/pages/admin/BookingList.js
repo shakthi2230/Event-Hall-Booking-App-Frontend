@@ -72,6 +72,7 @@ const BookingList = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Bookings list</h2>
+       
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <FaSpinner className="animate-spin text-4xl text-gray-600" />
